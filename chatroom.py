@@ -7,6 +7,7 @@ import json
 from collections import deque
 import os
 import hashlib
+import magic
 
 restoreHistoryLines = 50
 historyCache = deque(maxlen=restoreHistoryLines)
@@ -73,12 +74,20 @@ async def handler(websocket, path):
                 await websocket.ping()
             else:
                 if type(message) == bytes:
-                    imgName = hashlib.md5(message).hexdigest()
-                    imgPath = f"site/imgs/{imgName}"
-                    if not os.path.exists(imgPath):
-                        with open(imgPath, 'wb') as imgFile:
+                    objectName = hashlib.md5(message).hexdigest()
+                    objectPath = f"site/imgs/{objectName}"
+                    objectType = magic.from_buffer(message, mime=True)
+                    if not os.path.exists(objectPath):
+                        with open(objectPath, 'wb') as imgFile:
                             imgFile.write(message)
-                    message = f"<img src=imgs/{imgName}>"
+                    if 'image' in objectType:
+                        message = f"<img src=\"imgs/{objectName}\">"
+                    elif 'video' in objectType:
+                        message = f"<video src=\"imgs/{objectName}\" type=\"{objectType}\" controls>"
+                    elif 'audio' in objectType:
+                        message = f"<audio src=\"imgs/{objectName}\" type=\"{objectType}\" controls>"
+                    else:
+                        message = f"<object data=\"imgs/{objectName}\" type=\"{objectType}\">"
                 broadcastMessage = f"{timestampHead()}{name}: {message}"
                 websockets.broadcast(users, broadcastMessage)
                 logMessage(broadcastMessage)
@@ -102,7 +111,7 @@ async def checkAlive():
             count = 0
 
 async def main():
-    async with websockets.serve(handler, "0.0.0.0", 12345, ssl=ssl_context):
+    async with websockets.serve(handler, "0.0.0.0", 12345, ssl=ssl_context, max_size=100*1024*1024):
         await checkAlive()
         # await asyncio.Future()  # run forever
 
