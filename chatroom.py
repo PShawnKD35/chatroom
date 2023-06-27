@@ -6,6 +6,7 @@ from datetime import datetime
 import json
 from collections import deque
 import os
+import hashlib
 
 restoreHistoryLines = 50
 historyCache = deque(maxlen=restoreHistoryLines)
@@ -71,6 +72,13 @@ async def handler(websocket, path):
             if message == '':
                 await websocket.ping()
             else:
+                if type(message) == bytes:
+                    imgName = hashlib.md5(message).hexdigest()
+                    imgPath = f"site/imgs/{imgName}"
+                    if not os.path.exists(imgPath):
+                        with open(imgPath, 'wb') as imgFile:
+                            imgFile.write(message)
+                    message = f"<img src=imgs/{imgName}>"
                 broadcastMessage = f"{timestampHead()}{name}: {message}"
                 websockets.broadcast(users, broadcastMessage)
                 logMessage(broadcastMessage)
