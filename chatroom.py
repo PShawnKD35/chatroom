@@ -75,8 +75,13 @@ async def handler(websocket, path):
             else:
                 if type(message) == bytes:
                     objectName = hashlib.md5(message).hexdigest()
-                    objectPath = f"site/imgs/{objectName}"
                     objectType = magic.from_buffer(message, mime=True)
+                    objectTypeSplit = objectType.split('/')
+                    objectExtension = ''
+                    if objectTypeSplit[1]:
+                        objectExtension = objectTypeSplit[1]
+                        objectName = f"{objectName}.{objectExtension}"
+                    objectPath = f"site/imgs/{objectName}"
                     if not os.path.exists(objectPath):
                         with open(objectPath, 'wb') as imgFile:
                             imgFile.write(message)
