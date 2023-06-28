@@ -80,7 +80,7 @@
 			}
 		});
 		let appendChat = text => {
-			chatbox.insertAdjacentHTML("beforeend", `<div class="chatBubble">${text}<div/>`);
+			chatbox.insertAdjacentHTML("beforeend", `<div class="chatBubble">${text}</div>`);
 			window.scrollTo(0,document.body.scrollHeight);
 		}
 		let sendMessage2Server = text => ws.send(text);
