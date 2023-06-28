@@ -1,7 +1,7 @@
 # Project related
 history.txt
-site/imgs/*
-!site/imgs/.gitkeep
+site/objs/*
+!site/objs/.gitkeep
 secrets.json
 
 

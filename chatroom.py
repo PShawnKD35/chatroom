@@ -9,6 +9,7 @@ import os
 import hashlib
 import magic
 
+resFolder = "objs"
 restoreHistoryLines = 50
 historyCache = deque(maxlen=restoreHistoryLines)
 users = set()
@@ -81,18 +82,18 @@ async def handler(websocket, path):
                     if objectTypeSplit[1]:
                         objectExtension = objectTypeSplit[1]
                         objectName = f"{objectName}.{objectExtension}"
-                    objectPath = f"site/imgs/{objectName}"
+                    objectPath = f"site/{resFolder}/{objectName}"
                     if not os.path.exists(objectPath):
                         with open(objectPath, 'wb') as imgFile:
                             imgFile.write(message)
                     if 'image' in objectType:
-                        message = f"<img src=\"imgs/{objectName}\">"
+                        message = f"<img src=\"{resFolder}/{objectName}\">"
                     elif 'video' in objectType:
-                        message = f"<video src=\"imgs/{objectName}\" type=\"{objectType}\" controls>"
+                        message = f"<video src=\"{resFolder}/{objectName}\" type=\"{objectType}\" controls>"
                     elif 'audio' in objectType:
-                        message = f"<audio src=\"imgs/{objectName}\" type=\"{objectType}\" controls>"
+                        message = f"<audio src=\"{resFolder}/{objectName}\" type=\"{objectType}\" controls>"
                     else:
-                        message = f"<object data=\"imgs/{objectName}\" type=\"{objectType}\">"
+                        message = f"<object data=\"{resFolder}/{objectName}\" type=\"{objectType}\">"
                 broadcastMessage = f"{timestampHead()}{name}: {message}"
                 websockets.broadcast(users, broadcastMessage)
                 logMessage(broadcastMessage)
