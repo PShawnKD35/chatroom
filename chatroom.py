@@ -117,7 +117,7 @@ async def checkAlive():
             count = 0
 
 async def main():
-    async with websockets.serve(handler, "0.0.0.0", 12345, ssl=ssl_context, max_size=100*1024*1024):
+    async with websockets.serve(handler, "0.0.0.0", 12345, ssl=ssl_context, max_size=10*1024*1024*1024):
         await checkAlive()
         # await asyncio.Future()  # run forever
 
