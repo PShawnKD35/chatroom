@@ -162,3 +162,7 @@ let login = () => {
 		setInterval(sendHeartbeat, 7000);
 	}
 }
+
+if(("Notification" in window) && Notification.permission === "granted") {
+	login();
+}
