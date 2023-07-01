@@ -1,7 +1,7 @@
 video, audio, img, object { max-width: 100%; }
 input, button { border-radius: 5px; }
 #messageInput { min-width: 40%; }
-.myMessageBubble { background-color: #2ECC71; }
+.myMessageBubble { background-color: #196F3D; }
 
 .modal {
   display: none; /* Hidden by default */
