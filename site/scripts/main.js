@@ -18,17 +18,21 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-<!-- let connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection; -->
 
 <!-- websocket -->
 let connectSucceeded = false;
 let initialWebsocket = () => {
+	if (ws && ws.readyState !== 3)
+		return;
 	ws = new WebSocket(`wss://${window.location.hostname}:${wsPort}`);
 	ws.onopen = () => {
 		ws.send(secret);
 	}
 	ws.onmessage = event => {
-		connectSucceeded = true;
+		if (!connectSucceeded) {
+			connectSucceeded = true;
+			loginModal.style.display = "none";
+		}
 		if (event.data === "") return;
 		let newMessage = event.data.toString();
 		appendChat(newMessage);
@@ -148,11 +152,5 @@ let login = () => {
 		}
 		initialWebsocket();
 		setInterval(sendHeartbeat, 7000);
-		<!-- connection.ontypechange = sendHeartbeat; -->
-		<!-- connection.ontypechange = () => { -->
-			<!-- notifications.push(new Notification(ws.readyState)); -->
-			<!-- sendHeartbeat(); -->
-		<!-- } -->
 	}
-	loginModal.style.display = "none";
 }
