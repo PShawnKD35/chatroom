@@ -3,13 +3,14 @@ const wsPort = "12345";
 const messageSound = new Audio("newMessage.mp3");
 let notifications = [];
 <!-- IOS doesn't support Notification -->
-const messageBox = document.getElementById("message");
+const messageBox = document.getElementById("messageInput");
 const chatbox = document.getElementById("chatbox");
 const loginModal = document.getElementById("login");
 const waitingModal = document.getElementById("waiting");
 let secret = null;
 let ws = null;
 let recorder = null;
+let myLastMessage = null;
 try {
 	secret = decodeURIComponent(window.location.search.slice(1));
 } catch (e) {}
@@ -41,7 +42,7 @@ let initialWebsocket = () => {
 				notifications.push(new Notification(newMessage));
 			else
 				messageSound.play();
-		} catch (e) {}
+		} catch (e) { console.log(e); }
 	}
 	ws.onerror = event => {
 		alert(`Websocket connecting error, please check if the ws port ${wsPort} is open, and the ws service is running OK.`);
@@ -75,7 +76,12 @@ document.addEventListener('visibilitychange', () => {
 	}
 });
 let appendChat = text => {
-	chatbox.insertAdjacentHTML("beforeend", `<div class="chatBubble">${text}</div>`);
+	let message2Append = `<div class="chatBubble">${text}</div>`;
+	if (myLastMessage && text.endsWith(myLastMessage)) {
+		message2Append = `<div class="chatBubble myMessageBubble">${text}</div>`;
+		myLastMessage = null;
+	}
+	chatbox.insertAdjacentHTML("beforeend", message2Append);
 	window.scrollTo(0,document.body.scrollHeight);
 }
 let waitForSendingComplete = async () => {
@@ -93,15 +99,17 @@ let sendBinaryMessage = async data => {
 	} else
 		alert(`File size over limit ${binarySizeLimit/1024/1024} MB`);
 }
-let sendMessage = () => {
+let sendTextMessage = () => {
+	if (!messageBox.value || messageBox.value === "")
+		return;
 	let message2Send = messageBox.value;
+	myLastMessage = message2Send;
 	sendMessage2Server(message2Send);
-	<!-- appendChat(message2Send) -->
 	messageBox.value = "";
 };
 let checkInputAndSend = event => {
 	if(event.keyCode === 13)
-		sendMessage();
+		sendTextMessage();
 };
 let sendHeartbeat = () => {
 	if (ws.readyState === WebSocket.OPEN) ws.send(''); 
