@@ -8,6 +8,7 @@ from collections import deque
 import os
 import hashlib
 import magic
+from pymediainfo import MediaInfo
 
 resFolder = "objs"
 restoreHistoryLines = 50
@@ -76,24 +77,29 @@ async def handler(websocket, path):
             else:
                 if type(message) == bytes:
                     objectName = hashlib.md5(message).hexdigest()
-                    objectType = magic.from_buffer(message, mime=True)
-                    objectTypeSplit = objectType.split('/')
-                    objectExtension = ''
-                    if objectTypeSplit[1]:
-                        objectExtension = objectTypeSplit[1]
-                        objectName = f"{objectName}.{objectExtension}"
+                    objectMime = magic.from_buffer(message, mime=True)
+                    objectMimeSplits = objectMime.split('/')
+                    if objectMimeSplits[1]:
+                        objectName = f"{objectName}.{objectMimeSplits[1]}"
                     objectPath = f"site/{resFolder}/{objectName}"
                     if not os.path.exists(objectPath):
                         with open(objectPath, 'wb') as imgFile:
                             imgFile.write(message)
-                    if 'image' in objectType:
+                    objectMimeType = objectMimeSplits[0]
+                    #chrome audio record output would be identified as video/webm by magic, change to audio/webm
+                    if objectMime == "video/webm":
+                        media_info = MediaInfo.parse(objectPath)
+                        if len(media_info.video_tracks) == 0:
+                            objectMimeType = "audio"
+                            objectMime = "audio/webm"
+                    if 'image' == objectMimeType:
                         message = f"<img src=\"{resFolder}/{objectName}\">"
-                    elif 'video' in objectType:
-                        message = f"<video src=\"{resFolder}/{objectName}\" type=\"{objectType}\" controls>"
-                    elif 'audio' in objectType:
-                        message = f"<audio src=\"{resFolder}/{objectName}\" type=\"{objectType}\" controls>"
+                    elif 'video' == objectMimeType:
+                        message = f"<video src=\"{resFolder}/{objectName}\" type=\"{objectMime}\" controls>"
+                    elif 'audio' == objectMimeType:
+                        message = f"<audio src=\"{resFolder}/{objectName}\" type=\"{objectMime}\" controls>"
                     else:
-                        message = f"<object data=\"{resFolder}/{objectName}\" type=\"{objectType}\">"
+                        message = f"<object data=\"{resFolder}/{objectName}\" type=\"{objectMime}\">"
                 broadcastMessage = f"{timestampHead()}{name}: {message}"
                 websockets.broadcast(users, broadcastMessage)
                 logMessage(broadcastMessage)
