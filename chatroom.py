@@ -98,7 +98,7 @@ async def handler(websocket, path):
                 websockets.broadcast(users, broadcastMessage)
                 logMessage(broadcastMessage)
     except websockets.ConnectionClosed as e:
-        print(f"{timestampHead()}{name}({userIp}) connection lost. Reason: {e.rcvd.code}")
+        print(f"{timestampHead()}{name}({userIp}) connection lost.")
     finally:
         # Unregister
         users.remove(websocket)
