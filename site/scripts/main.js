@@ -151,7 +151,7 @@ document.onpaste = evt => {
 
 <!-- startWebsocket -->
 let login = () => {
-	if (secret != null && secret != '') {
+	if (secret) {
 		let firstTime = localStorage.getItem("first_time");
 		if(!firstTime) {
 			// first time loaded!
@@ -160,6 +160,8 @@ let login = () => {
 		}
 		initialWebsocket();
 		setInterval(sendHeartbeat, 7000);
+	} else {
+		alert("Seems you are in a place where you shouldn't be.");
 	}
 }
 
