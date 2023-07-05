@@ -137,8 +137,9 @@ let notifyMe = () => {
 // At last, if the user has denied notifications, and you
 // want to be respectful there is no need to bother them anymore.
 }
+// 引用回复
 document.ondblclick = e => {
-	if(e.target.className==="chatBubble") {
+	if(e.target.classList.contains("chatBubble")) {
 		messageBox.value = `${e.target.textContent} <---------- `;
 		messageBox.focus();
 	}
