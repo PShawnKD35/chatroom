@@ -140,7 +140,7 @@ let notifyMe = () => {
 // 引用回复
 document.ondblclick = e => {
 	if(e.target.classList.contains("chatBubble")) {
-		messageBox.value = `${e.target.textContent} <---------- `;
+		messageBox.value = `${e.target.innerHTML} <---------- `;
 		messageBox.focus();
 	}
 };
