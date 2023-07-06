@@ -139,8 +139,12 @@ let notifyMe = () => {
 }
 // 引用回复
 document.ondblclick = e => {
-	if(e.target.classList.contains("chatBubble")) {
+	let quoteClassName = "chatBubble";
+	if (e.target.classList.contains(quoteClassName)) {
 		messageBox.value = `${e.target.innerHTML} <---------- `;
+		messageBox.focus();
+	} else if (e.target.parentElement.classList.contains(quoteClassName)) {
+		messageBox.value = `${e.target.parentElement.innerHTML} <---------- `;
 		messageBox.focus();
 	}
 };
