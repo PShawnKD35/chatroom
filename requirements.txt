@@ -1,3 +1,7 @@
 apt install python3-websockets
 apt install python3-magic
 apt install python3-pymediainfo
+
+apk add py3-websockets
+apk add magic
+apk add pymediainfo
